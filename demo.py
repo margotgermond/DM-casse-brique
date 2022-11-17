@@ -9,8 +9,8 @@ class Jeu:
 
         # position initiale du vaisseau
         # (origine des positions : coin haut gauche)
-        self.vaisseau_x = 60
-        self.vaisseau_y = 60
+        self.vaisseau_x = 55
+        self.vaisseau_y = 120
 
         pyxel.run(self.update, self.draw)
 
@@ -22,10 +22,6 @@ class Jeu:
             self.vaisseau_x += 1
         if pyxel.btn(pyxel.KEY_LEFT) and self.vaisseau_x>0:
             self.vaisseau_x += -1
-        if pyxel.btn(pyxel.KEY_DOWN) and self.vaisseau_y<120:
-            self.vaisseau_y += 1
-        if pyxel.btn(pyxel.KEY_UP) and self.vaisseau_y>0:
-            self.vaisseau_y += -1
 
 
     # =====================================================
