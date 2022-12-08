@@ -37,8 +37,8 @@ ball_speed_step = 1
 ball_speed = [-1,-1]
 
 #compteur pour augmenter la vitesse toutes les 30 secondes
-COMPTEUR_VITESSE = 30*30
-compteur = 0
+#COMPTEUR_VITESSE = 30*30
+#compteur = 0
 
 # initialisation des balles
 MAX_BALLES = 1
