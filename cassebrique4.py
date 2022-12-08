@@ -12,9 +12,9 @@ TAILLE_PAD_VER = 8
 #taille de la balle (multiple de 2)
 TAILLE_BALLE = 6
 # taille de la brique
-TAILLE_BRIQUE_HOR = 16  #changer en 8 ou 16
-TAILLE_BRIQUE_VER = 8   #changer en 4 ou 8
-NOMBRE_RANGEES_BRIQUES = 4  #changer en 4 ou 8
+TAILLE_BRIQUE_HOR = 8  #changer en 8 ou 16
+TAILLE_BRIQUE_VER = 4   #changer en 4 ou 8
+NOMBRE_RANGEES_BRIQUES = 8  #changer en 4 ou 8
 NOMBRE_BRIQUES = int(TAILLE_FEN_HOR/TAILLE_BRIQUE_HOR * NOMBRE_RANGEES_BRIQUES)
 
 # ne pas modifier
