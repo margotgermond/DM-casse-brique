@@ -32,7 +32,7 @@ pad_x = (TAILLE_FEN_HOR -TAILLE_PAD_HOR)/2
 pad_y = (TAILLE_FEN_VER-TAILLE_PAD_VER)
 
 #vitesse initiale/step=1
-pad_step = 3
+pad_step = 4
 ball_speed_step = 1
 ball_speed = [-1,-1]
 
