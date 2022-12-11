@@ -1,11 +1,12 @@
 import pyxel
 import random
 
-
+# taille du bandeau de score
+TAILLE_BANDE_SCORE = 8
 
 # taille de la fenetre
 TAILLE_FEN_HOR = 128
-TAILLE_FEN_VER = 128
+TAILLE_FEN_VER = 128 + TAILLE_BANDE_SCORE
 # taille du pad 
 TAILLE_PAD_HOR = 24
 TAILLE_PAD_VER = 8
@@ -27,18 +28,21 @@ pyxel.load("platformer.pyxres",False, False, True, True)
 pyxel.playm(0, loop=True)
 
 # position initiale du pad
-# (origine des positions : coin haut gauche)
-pad_x = (TAILLE_FEN_HOR -TAILLE_PAD_HOR)/2
-pad_y = (TAILLE_FEN_VER-TAILLE_PAD_VER)
+# origine des positions : coin haut gauche
+pad_x = (TAILLE_FEN_HOR - TAILLE_PAD_HOR)/2
+pad_y = (TAILLE_FEN_VER - TAILLE_PAD_VER)
 
 #vitesse initiale/step=1
-pad_step = 4
+pad_step = 3
 ball_speed_step = 1
 ball_speed = [-1,-1]
 
 #compteur pour augmenter la vitesse toutes les 30 secondes
 COMPTEUR_VITESSE = 30*30
 compteur = 0
+score = 0
+dernier_score = 0
+valeurs_brique_par_rangee = [80,70,60,50,40,30,20,10]
 
 # initialisation des balles
 MAX_BALLES = 1
@@ -55,7 +59,7 @@ stopDraw = False
 def init_partie():
     # remise à 0/valeurs initiales
     global nombre_balles,balles_liste,briques_liste,explosions_liste
-    global compteur,ball_speed_step,ball_speed
+    global compteur,ball_speed_step,ball_speed,score, dernier_score
     nombre_balles = 0
     balles_liste = []
     briques_liste = []
@@ -63,7 +67,7 @@ def init_partie():
     compteur = 0
     ball_speed_step = 1
     ball_speed = [-1,-1]
-
+    score = 0
 
 def pad_deplacement(x, y):
     """déplacement avec les touches de directions"""
@@ -101,20 +105,26 @@ def balles_creation(x, y, balles_liste):
 # == CREATION BRIQUES
 # =========================================================
 def briques_creation(briques_liste):
-    global init_jeu
+    global init_jeu, valeurs_brique_par_rangee
     # Liste de brique crée au départ
     if not init_jeu :
-       x_brique = y_brique = 0
+#       x_brique = y_brique = 0
+       x_brique = 0
+       y_brique = TAILLE_BANDE_SCORE
+
        couleur_brique = NOMBRE_RANGEES_BRIQUES
-#       print (NOMBRE_BRIQUES)
+ #      print (NOMBRE_BRIQUES)
+       rangee_brique = 0
        for i in range(NOMBRE_BRIQUES):
-          briques_liste.append([x_brique, y_brique, couleur_brique])
+          valeur_brique = valeurs_brique_par_rangee[rangee_brique]
+          briques_liste.append([x_brique, y_brique, couleur_brique, valeur_brique])
           x_brique = x_brique + TAILLE_BRIQUE_HOR
           if(((i+1)%(NOMBRE_BRIQUES/NOMBRE_RANGEES_BRIQUES)) == 0):
                #nouvelle rangée
                x_brique = 0
                y_brique = y_brique + TAILLE_BRIQUE_VER
                couleur_brique = couleur_brique -1
+               rangee_brique  = rangee_brique +1
        init_jeu = True # La partie peut commencer   
     return briques_liste
 
@@ -123,7 +133,7 @@ def briques_creation(briques_liste):
 # =========================================================  
 def balles_deplacement(balles_liste, briques_liste):
     """déplacement de la balle """
-    global premier_contact, contact, stopDraw, nombre_balles
+    global premier_contact, contact, stopDraw, nombre_balles, score, dernier_score
 
     for balle in balles_liste:
 # A calculer suivant le vecteur vitesse
@@ -138,7 +148,8 @@ def balles_deplacement(balles_liste, briques_liste):
             ball_speed[0] = -ball_speed[0]
             pyxel.play(3,8)
             
-        if (balle[1] + ball_speed[1] <= 0 + TAILLE_BALLE/2):
+#        if (balle[1] + ball_speed[1] <= 0 + TAILLE_BALLE/2):
+        if (balle[1] + ball_speed[1] <= TAILLE_BANDE_SCORE + TAILLE_BALLE/2):
             # collision mur haut
             ball_speed[1] = -ball_speed[1]
             pyxel.play(3,8)
@@ -185,9 +196,10 @@ def balles_deplacement(balles_liste, briques_liste):
                          # Contact vertical (au dessous/en dessous)
                          ball_speed[1] = -ball_speed[1]
                      explosions_creation(brique[0] + TAILLE_BRIQUE_HOR/2, brique[1] + TAILLE_BRIQUE_VER/2)
-                # comptabilise le nombre de contacts de la brique
+                # comptabilise le nombre de contacts de la brique et augmente le score
                      brique[2] = brique[2] -1
                      if brique[2] == 0 : briques_liste.remove(brique)
+                     score = score + brique[3]
 
         balle[0] += ball_speed[0]
         balle[1] += ball_speed[1]
@@ -196,6 +208,7 @@ def balles_deplacement(balles_liste, briques_liste):
             balles_liste.remove(balle)
             nombre_balles = nombre_balles-1
             pyxel.play(3,11)
+            if nombre_balles == 0 : dernier_score = score
 
     return balles_liste
 
@@ -218,7 +231,8 @@ def update():
     """mise à jour des variables (30 fois par seconde)"""
 
     global pad_x, pad_y, compteur, balles_liste, ball_speed, ball_speed_step
-    global nombre_balles, init_jeu
+    global nombre_balles, init_jeu, score, dernier_score
+
     # Nouvelle partie ?
     if not init_jeu : init_partie()
     
@@ -251,7 +265,8 @@ def update():
         compteur += 1
     
     # mise à jour de l'état du jeu
-    if nombre_balles == 0: init_jeu = False #Perdu
+    if nombre_balles == 0:
+        init_jeu = False #Perdu
     elif briques_liste == []: init_jeu = False #Gagne
 
 # =========================================================
@@ -260,13 +275,12 @@ def update():
 def draw():
     """création des objets (30 fois par seconde)"""
     # Debug
-    global stopDraw, nombre_balles
+    global stopDraw, nombre_balles, score
     if not stopDraw:
 
     # vide la fenetre
        pyxel.cls(0)
-    
-    # pad (rectangle 8x8)
+       pyxel.text(45,1,'SCORE: '+str(score),15)
        #pyxel.rect(pad_x, pad_y, TAILLE_PAD_HOR, TAILLE_PAD_VER, 1)
        pyxel.blt(pad_x, pad_y, 0, 32, 40,TAILLE_PAD_HOR, TAILLE_PAD_VER)
         
@@ -277,6 +291,7 @@ def draw():
 # test si il reste une/des balles en jeu
        if nombre_balles == 0:
           pyxel.text(11,64, 'GAME OVER - SPACE TO START', 8)
+          pyxel.text(11,72, 'SCORE = '+ str(dernier_score), 15)
        else:
     # test si il reste une/des briques en jeu
           if briques_liste == []:
@@ -304,6 +319,5 @@ def draw():
                       pyxel.blt(brique[0], brique[1], 0, 0, 76,TAILLE_BRIQUE_HOR, TAILLE_BRIQUE_VER)
                   elif (brique[2] == 8):
                       pyxel.blt(brique[0], brique[1], 0, 0, 83,TAILLE_BRIQUE_HOR, TAILLE_BRIQUE_VER)
-
 
 pyxel.run(update, draw)
