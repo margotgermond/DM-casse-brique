@@ -321,3 +321,6 @@ def draw():
                       pyxel.blt(brique[0], brique[1], 0, 0, 83,TAILLE_BRIQUE_HOR, TAILLE_BRIQUE_VER)
 
 pyxel.run(update, draw)
+
+
+# https://kitao.github.io/pyxel/wasm/launcher/?run=margotgermond.DM-casse-brique.cassebrique
